@@ -13,7 +13,12 @@ import ArtistCard from "../components/ArtistCard";
 import AlbumCard from "../components/AlbumCard";
 import PodcastCard from "../components/PodcastCard";
 import SectionHeader from "../components/SectionHeader";
-import {songs, artists, playlists,albums,podcasts,categories} from "../data/musicData";
+
+import {songs, artists, playlists,
+  albums,
+podcasts,
+  categories,
+} from "../data/musicData";
 
 const ease = [0.16, 1, 0.3, 1];
 

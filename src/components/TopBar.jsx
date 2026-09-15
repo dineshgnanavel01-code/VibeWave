@@ -1,7 +1,25 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import {Menu, Search, Bell,User,Settings,LogOut,X,Play,Sparkles,ChevronRight,Music2,Headphones,Radio,Waves,} from "lucide-react";
+import {
+  Menu,
+  Search,
+  Bell,
+  User,
+  Settings,
+  LogOut,
+  X,
+  Play,
+  Sparkles,
+  ChevronRight,
+  Music2,
+  Headphones,
+  LogIn,
+  UserPlus,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { songs } from "../data/musicData";
+
+// If using React Router, uncomment the line below:
+// import { useNavigate } from "react-router-dom";
 
 const spring = {
   type: "spring",
@@ -14,14 +32,80 @@ export default function TopBar({
   search,
   setSearch,
   onPlay,
+  // Navigation / modal callbacks passed as props:
+  onNavigate,
+  onOpenAuthModal,
 }) {
+  // If using React Router, uncomment:
+  // const navigate = useNavigate();
+
   const [focused, setFocused] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
 
+  // Auth state tracker
+  const [user, setUser] = useState(null);
+
   const searchRef = useRef(null);
   const profileRef = useRef(null);
-  const notificationRef = useRef(null)
+  const notificationRef = useRef(null);
+
+  // Actions for Menu Buttons
+  const handleProfileClick = () => {
+    setProfileOpen(false);
+    
+    // 1. If using React Router:
+    // navigate("/profile/detail");
+
+    // 2. If using custom callback prop:
+    if (onNavigate) {
+      onNavigate("profile-detail");
+    } else {
+      console.log("Navigating to Profile Details...");
+    }
+  };
+
+  const handleSettingsClick = () => {
+    setProfileOpen(false);
+
+    // 1. If using React Router:
+    // navigate("/settings");
+
+    // 2. If using custom callback prop:
+    if (onNavigate) {
+      onNavigate("settings");
+    } else {
+      console.log("Navigating to Settings...");
+    }
+  };
+
+  const handleLoginClick = () => {
+    setProfileOpen(false);
+
+    if (onOpenAuthModal) {
+      onOpenAuthModal("login");
+    } else {
+      console.log("Opening Log In dialog/page...");
+      // navigate("/login");
+    }
+  };
+
+  const handleSignupClick = () => {
+    setProfileOpen(false);
+
+    if (onOpenAuthModal) {
+      onOpenAuthModal("signup");
+    } else {
+      console.log("Opening Sign Up dialog/page...");
+      // navigate("/signup");
+    }
+  };
+
+  const handleLogoutClick = () => {
+    setProfileOpen(false);
+    setUser(null);
+    console.log("User logged out");
+  };
 
   const results = useMemo(() => {
     const query = (search || "").trim().toLowerCase();
@@ -36,12 +120,11 @@ export default function TopBar({
           song.album,
           song.language,
           song.category,
-        ].some((value) =>
-          value?.toLowerCase().includes(query)
-        )
+        ].some((value) => value?.toLowerCase().includes(query))
       )
       .slice(0, 10);
   }, [search]);
+
   useEffect(() => {
     const closeDropdowns = (event) => {
       if (
@@ -62,10 +145,7 @@ export default function TopBar({
     document.addEventListener("mousedown", closeDropdowns);
 
     return () => {
-      document.removeEventListener(
-        "mousedown",
-        closeDropdowns
-      );
+      document.removeEventListener("mousedown", closeDropdowns);
     };
   }, []);
 
@@ -77,9 +157,7 @@ export default function TopBar({
       ) {
         event.preventDefault();
 
-        const input =
-          searchRef.current?.querySelector("input");
-
+        const input = searchRef.current?.querySelector("input");
         input?.focus();
         setFocused(true);
       }
@@ -94,10 +172,7 @@ export default function TopBar({
     document.addEventListener("keydown", handleKeyboard);
 
     return () => {
-      document.removeEventListener(
-        "keydown",
-        handleKeyboard
-      );
+      document.removeEventListener("keydown", handleKeyboard);
     };
   }, []);
 
@@ -112,9 +187,7 @@ export default function TopBar({
     setSearch("");
 
     requestAnimationFrame(() => {
-      searchRef.current
-        ?.querySelector("input")
-        ?.focus();
+      searchRef.current?.querySelector("input")?.focus();
     });
   };
 
@@ -135,7 +208,7 @@ export default function TopBar({
         perspective: "1400px",
       }}
     >
-<motion.div
+      <motion.div
         className="
           pointer-events-none
           absolute
@@ -193,8 +266,6 @@ export default function TopBar({
           transformStyle: "preserve-3d",
         }}
       >
-        
-
         <div className="flex shrink-0 items-center gap-1 lg:hidden">
           <motion.button
             type="button"
@@ -245,12 +316,8 @@ export default function TopBar({
               }}
             />
 
-            <Menu
-              size={21}
-              className="relative z-10"
-            />
+            <Menu size={21} className="relative z-10" />
           </motion.button>
-
 
           <motion.button
             type="button"
@@ -302,7 +369,6 @@ export default function TopBar({
                 }}
               />
 
-
               <div
                 className="
                   relative
@@ -318,9 +384,7 @@ export default function TopBar({
                   shadow-[0_8px_25px_rgba(34,197,94,0.25)]
                 "
               >
-                <span className="relative z-10">
-                  🎵
-                </span>
+                <span className="relative z-10">🎵</span>
 
                 <motion.div
                   className="
@@ -369,7 +433,7 @@ export default function TopBar({
           </motion.button>
         </div>
 
-       
+        {/* Search Bar */}
         <motion.div
           ref={searchRef}
           className="relative min-w-0 flex-1"
@@ -377,7 +441,6 @@ export default function TopBar({
             transformStyle: "preserve-3d",
           }}
         >
-
           <AnimatePresence>
             {focused && (
               <>
@@ -423,6 +486,7 @@ export default function TopBar({
               </>
             )}
           </AnimatePresence>
+
           <motion.div
             whileHover={{
               y: -1,
@@ -482,14 +546,9 @@ export default function TopBar({
             >
               <Search
                 size={18}
-                className={
-                  focused
-                    ? "text-green-400"
-                    : "text-zinc-500"
-                }
+                className={focused ? "text-green-400" : "text-zinc-500"}
               />
             </motion.div>
-
 
             <input
               type="text"
@@ -617,7 +676,6 @@ export default function TopBar({
                   transformStyle: "preserve-3d",
                 }}
               >
-
                 <div className="flex items-center justify-between px-3 py-2">
                   <div className="flex items-center gap-2">
                     <motion.div
@@ -629,10 +687,7 @@ export default function TopBar({
                         repeat: Infinity,
                       }}
                     >
-                      <Sparkles
-                        size={13}
-                        className="text-green-400"
-                      />
+                      <Sparkles size={13} className="text-green-400" />
                     </motion.div>
 
                     <span className="text-[10px] font-bold uppercase tracking-[1.5px] text-zinc-500">
@@ -644,7 +699,6 @@ export default function TopBar({
                     {results.length} found
                   </span>
                 </div>
-
 
                 {results.length > 0 ? (
                   <div className="space-y-1">
@@ -693,7 +747,6 @@ export default function TopBar({
                           perspective: "900px",
                         }}
                       >
-
                         <motion.div
                           className="
                             pointer-events-none
@@ -710,8 +763,6 @@ export default function TopBar({
                           }}
                         />
 
-                        
-
                         <motion.div
                           whileHover={{
                             rotateY: 12,
@@ -726,8 +777,7 @@ export default function TopBar({
                             shrink-0
                           "
                           style={{
-                            transformStyle:
-                              "preserve-3d",
+                            transformStyle: "preserve-3d",
                           }}
                         >
                           <img
@@ -753,10 +803,7 @@ export default function TopBar({
                               group-hover:opacity-100
                             "
                           >
-                            <Play
-                              size={17}
-                              fill="currentColor"
-                            />
+                            <Play size={17} fill="currentColor" />
                           </div>
                         </motion.div>
 
@@ -805,14 +852,10 @@ export default function TopBar({
                             group-hover:text-black
                           "
                           style={{
-                            transformStyle:
-                              "preserve-3d",
+                            transformStyle: "preserve-3d",
                           }}
                         >
-                          <Play
-                            size={14}
-                            fill="currentColor"
-                          />
+                          <Play size={14} fill="currentColor" />
                         </motion.div>
                       </motion.button>
                     ))}
@@ -867,12 +910,10 @@ export default function TopBar({
           </AnimatePresence>
         </motion.div>
 
+        {/* Right Controls */}
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-        
-          <div
-            ref={notificationRef}
-            className="relative hidden sm:block"
-          >
+          {/* Notifications */}
+          <div ref={notificationRef} className="relative hidden sm:block">
             <motion.button
               type="button"
               onClick={() => {
@@ -1042,10 +1083,7 @@ export default function TopBar({
                               ${item.bg}
                             `}
                           >
-                            <Icon
-                              size={17}
-                              className={item.color}
-                            />
+                            <Icon size={17} className={item.color} />
                           </div>
 
                           <div>
@@ -1065,10 +1103,9 @@ export default function TopBar({
               )}
             </AnimatePresence>
           </div>
-          <div
-            ref={profileRef}
-            className="relative"
-          >
+
+          {/* Profile Dropdown */}
+          <div ref={profileRef} className="relative">
             <motion.button
               type="button"
               onClick={() => {
@@ -1170,13 +1207,9 @@ export default function TopBar({
               </motion.div>
 
               <div className="hidden text-left lg:block">
-                <p className="text-xs font-bold text-white">
-                  John Doe
-                </p>
+                <p className="text-xs font-bold text-white">Dinesh G</p>
 
-                <p className="text-[9px] text-green-400">
-                  Premium Member
-                </p>
+                <p className="text-[9px] text-green-400">Premium Member</p>
               </div>
 
               <motion.div
@@ -1190,6 +1223,7 @@ export default function TopBar({
                 />
               </motion.div>
             </motion.button>
+
             <AnimatePresence>
               {profileOpen && (
                 <motion.div
@@ -1228,12 +1262,17 @@ export default function TopBar({
                     transformStyle: "preserve-3d",
                   }}
                 >
+                  {/* User Profile Info Header (Clickable) */}
                   <div
+                    onClick={handleProfileClick}
                     className="
                       relative
+                      cursor-pointer
                       overflow-hidden
                       border-b border-white/10
                       p-4
+                      transition
+                      hover:bg-white/[0.04]
                     "
                   >
                     <motion.div
@@ -1279,9 +1318,7 @@ export default function TopBar({
                       </motion.div>
 
                       <div>
-                        <p className="font-bold text-white">
-                          Dinesh G
-                        </p>
+                        <p className="font-bold text-white">Dinesh G</p>
 
                         <p className="mt-0.5 text-[10px] text-zinc-500">
                           vibewave@gmail.com
@@ -1290,68 +1327,74 @@ export default function TopBar({
                     </div>
                   </div>
 
-                  
-
+                  {/* Dropdown Menu Items */}
                   <div className="p-2">
                     {[
                       {
                         icon: User,
                         text: "View Profile",
+                        color: "text-zinc-400",
+                        hover: "hover:bg-white/[0.07] hover:text-white",
+                        onClick: handleProfileClick,
                       },
                       {
                         icon: Settings,
                         text: "Settings",
+                        color: "text-zinc-400",
+                        hover: "hover:bg-white/[0.07] hover:text-white",
+                        onClick: handleSettingsClick,
                       },
-                    ].map((item) => {
+                      {
+                        icon: LogIn,
+                        text: "Log In",
+                        color: "text-emerald-400",
+                        hover: "hover:bg-emerald-400/10",
+                        onClick: handleLoginClick,
+                      },
+                      {
+                        icon: UserPlus,
+                        text: "Sign Up",
+                        color: "text-cyan-400",
+                        hover: "hover:bg-cyan-400/10",
+                        onClick: handleSignupClick,
+                      },
+                    ].map((item, idx) => {
                       const Icon = item.icon;
-
                       return (
-                        <motion.button
-                          key={item.text}
-                          type="button"
-                          whileHover={{
-                            x: 5,
-                            scale: 1.02,
-                          }}
-                          transition={spring}
-                          className="
-                            flex w-full
-                            items-center gap-3
-                            rounded-xl
-                            px-3 py-2.5
-                            text-sm
-                            text-zinc-300
-                            hover:bg-white/[0.07]
-                            hover:text-white
-                          "
-                        >
-                          <Icon size={17} />
-                          {item.text}
-                        </motion.button>
+                        <div key={item.text}>
+                          {idx === 2 && (
+                            <div className="my-1 border-t border-white/10" />
+                          )}
+
+                          <motion.button
+                            type="button"
+                            onClick={item.onClick}
+                            whileHover={{ x: 5, scale: 1.02 }}
+                            transition={spring}
+                            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium ${item.color} ${item.hover}`}
+                          >
+                            <Icon size={17} className={item.color} />
+                            {item.text}
+                          </motion.button>
+                        </div>
                       );
                     })}
 
-                    <div className="my-1 border-t border-white/10" />
-
-                    <motion.button
-                      type="button"
-                      whileHover={{
-                        x: 5,
-                        scale: 1.02,
-                      }}
-                      className="
-                        flex w-full
-                        items-center gap-3
-                        rounded-xl
-                        px-3 py-2.5
-                        text-sm
-                        text-red-400
-                        hover:bg-red-500/10
-                      "
-                    >
-                      <LogOut size={17} />
-                      Log out
-                    </motion.button>
+                    {user && (
+                      <>
+                        <div className="my-1 border-t border-white/10" />
+                        <motion.button
+                          type="button"
+                          onClick={handleLogoutClick}
+                          whileHover={{ x: 5, scale: 1.02 }}
+                          transition={spring}
+                          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-400 hover:bg-red-500/10"
+                        >
+                          <LogOut size={17} />
+                          Log out
+                        </motion.button>
+                      </>
+                    )}
                   </div>
                 </motion.div>
               )}
