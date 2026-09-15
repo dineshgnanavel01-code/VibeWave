@@ -21,11 +21,7 @@ export default function TopBar({
 
   const searchRef = useRef(null);
   const profileRef = useRef(null);
-  const notificationRef = useRef(null);
-
-  /* =====================================================
-     SEARCH RESULTS
-  ===================================================== */
+  const notificationRef = useRef(null)
 
   const results = useMemo(() => {
     const query = (search || "").trim().toLowerCase();
@@ -46,11 +42,6 @@ export default function TopBar({
       )
       .slice(0, 10);
   }, [search]);
-
-  /* =====================================================
-     CLOSE DROPDOWNS
-  ===================================================== */
-
   useEffect(() => {
     const closeDropdowns = (event) => {
       if (

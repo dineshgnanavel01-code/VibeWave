@@ -9,7 +9,6 @@ import Search from "./pages/Search";
 import Playlist from "./pages/Playlist";
 import Artist from "./pages/Artist";
 import CollectionPage from "./pages/CollectionPage";
-
 import { playlists, artists } from "./data/musicData";
 
 export default function App() {

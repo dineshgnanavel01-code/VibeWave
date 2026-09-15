@@ -4,7 +4,6 @@ import {Play,UserPlus,UserCheck,MoreHorizontal,Headphones,Heart, Disc3, Radio, S
 import { songs, albums } from "../data/musicData";
 
 const ease = [0.16, 1, 0.3, 1];
-
 const spring = {
   type: "spring",
   stiffness: 180,
@@ -14,7 +13,6 @@ const spring = {
 export default function Artist({ artist, onPlay }) {
   const [following, setFollowing] = useState(false);
   const [likedSongs, setLikedSongs] = useState([]);
-
   const artistName = artist?.name || "Popular Artist";
   const artistImage = artist?.image || songs[0]?.image;
 
