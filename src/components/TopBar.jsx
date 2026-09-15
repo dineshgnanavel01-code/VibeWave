@@ -698,7 +698,7 @@ export default function TopBar({
                   to-blue-500
                   text-[11px]
                   font-black
-                  text-black
+                  text-blackhttps://vibe-wave-six.vercel.app/
                 "
               >
                 {initials}
@@ -785,7 +785,7 @@ export default function TopBar({
 
                       <div className="min-w-0">
                         <p className="truncate font-bold text-white">
-                          {user?.name || "WeMusic User"}
+                          {user?.name || "VibeWave"}
                         </p>
 
                         <p className="mt-0.5 truncate text-[10px] text-zinc-500">
