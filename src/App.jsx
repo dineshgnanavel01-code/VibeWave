@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 
@@ -12,8 +11,14 @@ import Search from "./pages/Search";
 import Playlist from "./pages/Playlist";
 import Artist from "./pages/Artist";
 import CollectionPage from "./pages/CollectionPage";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 
 import { playlists, artists } from "./data/musicData";
+
+import { useAuth } from "./context/AuthContext";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -28,7 +33,8 @@ export default function App() {
   const [selectedPlaylist, setSelectedPlaylist] = useState(playlists[0]);
   const [selectedArtist, setSelectedArtist] = useState(artists[0]);
 
-  // Splash screen
+  const { user, logout } = useAuth();
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
@@ -37,7 +43,6 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Play song
   const handlePlay = (song) => {
     if (!song) return;
 
@@ -45,7 +50,6 @@ export default function App() {
     setPlaying(true);
   };
 
-  // Open playlist
   const handlePlaylist = (playlist) => {
     if (!playlist) return;
 
@@ -54,7 +58,6 @@ export default function App() {
     setMobileOpen(false);
   };
 
-  // Open artist
   const handleArtist = (artist) => {
     if (!artist) return;
 
@@ -63,13 +66,63 @@ export default function App() {
     setMobileOpen(false);
   };
 
-  // Navigation
   const handleNavigation = (page) => {
     setActive(page);
     setMobileOpen(false);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
-  // Collection pages
+  const handleProfile = () => {
+    setActive("Profile");
+    setMobileOpen(false);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const handleSettings = () => {
+    setActive("Settings");
+    setMobileOpen(false);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const handleLogin = () => {
+    setActive("Login");
+    setMobileOpen(false);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const handleSignup = () => {
+    setActive("Signup");
+    setMobileOpen(false);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const handleLogout = () => {
+    logout?.();
+
+    setActive("Home");
+    setMobileOpen(false);
+  };
+
   const collectionPages = [
     "Your Library",
     "Liked Songs",
@@ -91,15 +144,12 @@ export default function App() {
 
   return (
     <>
-      {/* Splash Screen */}
       <AnimatePresence mode="wait">
         {loading && <SplashScreen key="splash" />}
       </AnimatePresence>
 
-      {/* Main Application */}
       {!loading && (
         <div className="min-h-screen bg-black text-white">
-          {/* Sidebar */}
           <Sidebar
             active={active}
             setActive={handleNavigation}
@@ -107,73 +157,112 @@ export default function App() {
             setMobileOpen={setMobileOpen}
           />
 
-          {/* Main Content Area */}
-          <div className="relative min-h-screen">
-            {/* Top Bar */}
-            <div className="relative z-40">
-              <TopBar
-                setMobileOpen={setMobileOpen}
+          <div className="relative z-40">
+            <TopBar
+              setMobileOpen={setMobileOpen}
+              search={search}
+              setSearch={setSearch}
+              onPlay={handlePlay}
+              onNavigate={handleNavigation}
+              onProfile={handleProfile}
+              onSettings={handleSettings}
+              onLogin={handleLogin}
+              onSignup={handleSignup}
+              onLogout={handleLogout}
+            />
+
+            {/* HOME */}
+            {active === "Home" && (
+              <Home
+                onPlay={handlePlay}
+                onExplore={() => {
+                  setActive("Search");
+                  setSearch("");
+                  setMobileOpen(false);
+                }}
+                onPlaylist={handlePlaylist}
+                onArtist={handleArtist}
+              />
+            )}
+
+            {/* SEARCH */}
+            {active === "Search" && (
+              <Search
                 search={search}
                 setSearch={setSearch}
                 onPlay={handlePlay}
+                onArtist={handleArtist}
+                onPlaylist={handlePlaylist}
               />
-            </div>
+            )}
 
-            {/* Pages */}
-            <main>
-              {/* Home */}
-              {active === "Home" && (
-                <Home
-                  onPlay={handlePlay}
-                  onExplore={() => {
-                    setActive("Search");
-                    setSearch("");
-                    setMobileOpen(false);
-                  }}
-                  onPlaylist={handlePlaylist}
-                  onArtist={handleArtist}
-                />
-              )}
+            {/* PLAYLIST */}
+            {active === "Playlist" && (
+              <Playlist
+                playlist={selectedPlaylist}
+                onPlay={handlePlay}
+              />
+            )}
 
-              {/* Search */}
-              {active === "Search" && (
-                <Search
-                  search={search}
-                  setSearch={setSearch}
-                  onPlay={handlePlay}
-                  onArtist={handleArtist}
-                  onPlaylist={handlePlaylist}
-                />
-              )}
+            {/* ARTIST */}
+            {active === "Artist" && (
+              <Artist
+                artist={selectedArtist}
+                onPlay={handlePlay}
+              />
+            )}
 
-              {/* Playlist */}
-              {active === "Playlist" && (
-                <Playlist
-                  playlist={selectedPlaylist}
-                  onPlay={handlePlay}
-                />
-              )}
+            {/* COLLECTION PAGES */}
+            {isCollectionPage && (
+              <CollectionPage
+                active={active}
+                onPlay={handlePlay}
+                onArtist={handleArtist}
+                onPlaylist={handlePlaylist}
+              />
+            )}
 
-              {/* Artist */}
-              {active === "Artist" && (
-                <Artist
-                  artist={selectedArtist}
-                  onPlay={handlePlay}
-                />
-              )}
+            {/* PROFILE */}
+            {active === "Profile" && (
+              <Profile
+                user={user}
+                onBack={() => handleNavigation("Home")}
+                onSettings={handleSettings}
+              />
+            )}
 
-              {/* Collection Pages */}
-              {isCollectionPage && (
-                <CollectionPage
-                  active={active}
-                  onPlay={handlePlay}
-                  onArtist={handleArtist}
-                  onPlaylist={handlePlaylist}
-                />
-              )}
-            </main>
+            {/* SETTINGS */}
+            {active === "Settings" && (
+              <Settings
+                user={user}
+                onBack={handleProfile}
+              />
+            )}
 
-            {/* Music Player */}
+            {/* LOGIN */}
+            {active === "Login" && (
+              <Login
+                onLoginSuccess={() => {
+                  setActive("Home");
+                  setMobileOpen(false);
+                }}
+                onSignup={handleSignup}
+                onBack={() => handleNavigation("Home")}
+              />
+            )}
+
+            {/* SIGN UP */}
+            {active === "Signup" && (
+              <Signup
+                onSignupSuccess={() => {
+                  setActive("Home");
+                  setMobileOpen(false);
+                }}
+                onLogin={handleLogin}
+                onBack={() => handleNavigation("Home")}
+              />
+            )}
+
             <MusicPlayer
               currentSong={currentSong}
               playing={playing}
